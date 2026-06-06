@@ -1,0 +1,9 @@
+_scan/
+__pycache__/
+*.egg-info/
+*.egg-link
+__editable__*
+build/
+dist/
+*.pyc
+.DS_Store
