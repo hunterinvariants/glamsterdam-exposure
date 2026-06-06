@@ -26,5 +26,25 @@
   {"name": "RocketPool Storage",     "address": "0x1d8f8f00cfa6758d7bE78336684788Fb0ee0Fa46"},
   {"name": "DAI",                    "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F"},
   {"name": "MKR",                    "address": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"},
-  {"name": "Synthetix ProxyERC20",   "address": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F"}
+  {"name": "Synthetix ProxyERC20",   "address": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F"},
+
+  {"name": "Uniswap V3 Factory",     "address": "0x1F98431c8aD98523631AE4a59f267346ea31F984"},
+  {"name": "Uniswap V3 PositionMgr", "address": "0xC36442b4a4522E871399CD717aBDD847Ab11FE88"},
+  {"name": "Uniswap V4 PoolManager", "address": "0x000000000004444c5dc75cB358380D2e3dE08A90"},
+  {"name": "Aave V3 Pool",           "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"},
+  {"name": "Morpho Blue",            "address": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"},
+  {"name": "MakerDAO Vat",           "address": "0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B"},
+  {"name": "Liquity BorrowerOps",    "address": "0x24179CD81c9e782A4096035f7eC97fB8B783e007"},
+  {"name": "USDC",                   "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"},
+  {"name": "USDT",                   "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7"},
+  {"name": "FRAX",                   "address": "0x853d955aCEf822Db058eb8505911ED77F175b99e"},
+  {"name": "WBTC",                   "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"},
+  {"name": "LUSD",                   "address": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0"},
+  {"name": "wstETH",                 "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"},
+  {"name": "rETH",                   "address": "0xae78736Cd615f374D3085123A210448E74Fc6393"},
+  {"name": "EigenLayer StrategyMgr", "address": "0x858646372CC42E1A627fcE94aa7A7033e7CF075A"},
+  {"name": "EigenLayer Delegation",  "address": "0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A"},
+  {"name": "Lido WithdrawalQueue",   "address": "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"},
+  {"name": "Frax frxETH Minter",     "address": "0xbAFA44EFE7901E04E39Dad13167D089C559c1138"},
+  {"name": "Convex Booster",         "address": "0xF403C135812408BFbE8713b5A23a04b3D48AAE31"}
 ]

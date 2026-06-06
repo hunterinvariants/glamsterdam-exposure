@@ -8,9 +8,9 @@ scanned with the `gas-reprice-fragile` detector. Every site is a real line in de
 
 ## Summary
 
-- contracts scanned (compiled): 28
-- contracts with fragile sites: 8
-- total flagged sites: 11
+- contracts scanned (compiled): 47
+- contracts with fragile sites: 9
+- total flagged sites: 12
 
 | Contract | Address | solc | Status | Sites |
 |---|---|---|---|:--:|
@@ -42,6 +42,25 @@ scanned with the `gas-reprice-fragile` detector. Every site is a real line in de
 | DAI | `0x6B175474E89094C44Da98b954EedeAC495271d0F` | 0.5.12 | clean | 0 |
 | MKR | `0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2` | 0.4.18 | clean | 0 |
 | Synthetix ProxyERC20 | `0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F` | 0.4.25 | clean | 0 |
+| Uniswap V3 Factory | `0x1F98431c8aD98523631AE4a59f267346ea31F984` | 0.7.6 | clean | 0 |
+| Uniswap V3 PositionMgr | `0xC36442b4a4522E871399CD717aBDD847Ab11FE88` | 0.7.6 | clean | 0 |
+| Uniswap V4 PoolManager | `0x000000000004444c5dc75cB358380D2e3dE08A90` | 0.8.26 | clean | 0 |
+| Aave V3 Pool | `0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2` | 0.8.27 | clean | 0 |
+| Morpho Blue | `0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb` | 0.8.19 | clean | 0 |
+| MakerDAO Vat | `0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B` | 0.5.12 | clean | 0 |
+| Liquity BorrowerOps | `0x24179CD81c9e782A4096035f7eC97fB8B783e007` | 0.6.11 | clean | 0 |
+| USDC | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` | 0.6.12 | clean | 0 |
+| USDT | `0xdAC17F958D2ee523a2206206994597C13D831ec7` | 0.4.18 | clean | 0 |
+| FRAX | `0x853d955aCEf822Db058eb8505911ED77F175b99e` | 0.6.11 | clean | 0 |
+| WBTC | `0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599` | 0.4.24 | clean | 0 |
+| LUSD | `0x5f98805A4E8be255a32880FDeC7F6728C6568bA0` | 0.6.11 | clean | 0 |
+| wstETH | `0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0` | 0.6.12 | clean | 0 |
+| rETH | `0xae78736Cd615f374D3085123A210448E74Fc6393` | 0.7.6 | ok | 1 |
+| EigenLayer StrategyMgr | `0x858646372CC42E1A627fcE94aa7A7033e7CF075A` | 0.8.30 | clean | 0 |
+| EigenLayer Delegation | `0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A` | 0.8.30 | clean | 0 |
+| Lido WithdrawalQueue | `0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1` | 0.8.9 | clean | 0 |
+| Frax frxETH Minter | `0xbAFA44EFE7901E04E39Dad13167D089C559c1138` | 0.8.16 | clean | 0 |
+| Convex Booster | `0xF403C135812408BFbE8713b5A23a04b3D48AAE31` | 0.6.12 | clean | 0 |
 
 ## Sites
 
@@ -71,6 +90,9 @@ scanned with the `gas-reprice-fragile` detector. Every site is a real line in de
 
 ### Gnosis Safe Singleton  (`0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552`)
 - GnosisSafe.handlePayment(uint256,uint256,uint256,address,address) (contracts/GnosisSafe.sol#196-213)  uses address.send() -- forwards a fixed 2300-gas stipend; an EVM gas repricing (e.g. Glamsterdam) can make it insufficient and break this path.  (contracts/GnosisSafe.sol:196)
+
+### rETH  (`0xae78736Cd615f374D3085123A210448E74Fc6393`)
+- RocketTokenRETH.burn(uint256) (contracts/contract/token/RocketTokenRETH.sol#132-149)  uses address.transfer() -- forwards a fixed 2300-gas stipend; an EVM gas repricing (e.g. Glamsterdam) can make it insufficient and break this path.  (contracts/contract/token/RocketTokenRETH.sol:132)
 
 ## Reading this
 
