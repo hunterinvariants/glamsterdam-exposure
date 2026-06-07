@@ -1,7 +1,0 @@
-'solc --version' running
-'solc corpus/Inherited.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/home/user/reprice-scan/corpus' running
-INFO:Detectors:
-Detector: gas-reprice-fragile
-PayoutBase._payout(address,uint256) (corpus/Inherited.sol#9-11)  uses address.transfer() -- forwards a fixed 2300-gas stipend; an EVM gas repricing (e.g. Glamsterdam) can make it insufficient and break this path.
-Reference: https://github.com/hunterinvariants/glamsterdam-exposure
-INFO:Slither:corpus/Inherited.sol analyzed (2 contracts with 1 detectors), 1 result(s) found

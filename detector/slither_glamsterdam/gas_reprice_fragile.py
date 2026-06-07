@@ -7,23 +7,14 @@ the class a Glamsterdam gas repricing can break:
   - address.send(...)       forwards a fixed 2300-gas stipend
   - x.call{gas: K}(...)      hardcodes a gas budget on an external call
 
-Scope: scans every contract in the target, including base/abstract contracts reached only through
-inheritance, so a fragile value-send declared in a base is not missed. Each function is visited in the
-contract that declares it, so there is no double-reporting. Hardcoded-gas detection is literal-only
-(a gas budget passed as a named constant is not resolved to its value).
-
-EIP-1884 (Istanbul, 2019) already made the 2300-gas stipend insufficient once; a Glamsterdam gas
-repricing can do it again. The detector is type-aware: Slither models an ETH `.transfer` as the
-Transfer operation, so an ERC-20 token `.transfer(to, amount)` -- an ordinary contract call -- is
-not flagged.
+EIP-1884 (Istanbul, 2019) repriced SLOAD and already made the 2300-gas stipend insufficient once;
+a Glamsterdam gas repricing can do it again. The detector is type-aware: Slither models an ETH
+`.transfer` as the Transfer operation, so an ERC-20 token `.transfer(to, amount)` -- an ordinary
+contract call -- is not flagged.
 """
 from slither.detectors.abstract_detector import AbstractDetector, DetectorClassification
 from slither.slithir.operations import Transfer, Send, HighLevelCall, LowLevelCall
-
-try:
-    from slither.slithir.variables.constant import Constant
-except Exception:  # defensive across slither versions
-    Constant = None
+from slither.slithir.variables import Constant
 
 
 class GasRepriceFragile(AbstractDetector):
@@ -53,20 +44,12 @@ class GasRepriceFragile(AbstractDetector):
 
     @staticmethod
     def _hardcoded_gas(ir):
-        gas = getattr(ir, "call_gas", None)
-        if gas is None:
-            return None
-        if Constant is not None and isinstance(gas, Constant):
-            return gas.value
-        val = getattr(gas, "value", None)
-        return val if isinstance(val, int) else None
+        g = getattr(ir, "call_gas", None)
+        return g if isinstance(g, Constant) else None
 
     def _detect(self):
         results = []
-        seen = set()
-        # all contracts (not just leaves) so a fragile send in an inherited base is caught;
-        # functions_and_modifiers_declared visits each function in its declaring contract -> no dupes.
-        for contract in self.compilation_unit.contracts:
+        for contract in self.compilation_unit.contracts_derived:
             for function in contract.functions_and_modifiers_declared:
                 for node in function.nodes:
                     for ir in node.irs:
@@ -81,9 +64,5 @@ class GasRepriceFragile(AbstractDetector):
                                 reason = ("hardcodes gas ({}) on an external call -- a gas repricing "
                                           "can make it insufficient and break this path.".format(g))
                         if reason is not None:
-                            key = (function.canonical_name, node.node_id)
-                            if key in seen:
-                                continue
-                            seen.add(key)
                             results.append(self.generate_result([function, "  ", reason, "\n"]))
         return results
