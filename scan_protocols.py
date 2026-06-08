@@ -15,6 +15,7 @@ Usage:  python scan_protocols.py targets.json
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -117,12 +118,16 @@ def fetch(address):
 
 
 def ensure_solc(version):
+    """Install the requested solc via solc-select. Returns True if a usable solc is in place
+    (already-installed is idempotent and returns 0), False if the install failed."""
     if not version:
-        return
+        return True
     try:
-        subprocess.run(["solc-select", "install", version], capture_output=True, text=True, timeout=300)
+        p = subprocess.run(["solc-select", "install", version],
+                           capture_output=True, text=True, timeout=300)
+        return p.returncode == 0
     except Exception:
-        pass
+        return False
 
 
 def scan(root, entry, solc, remaps):
@@ -208,13 +213,20 @@ def write_report(rows):
 def main():
     if not KEY:
         sys.exit("set ETHERSCAN_API_KEY in the environment first")
+    if shutil.which("solc-select") is None:
+        sys.exit("solc-select not on PATH -- install it first:  pipx install solc-select  "
+                 "(or pip install solc-select). Each contract is compiled with its original solc, "
+                 "pulled on demand; without solc-select every non-default-solc source build-fails "
+                 "silently, which understates the result.")
     targets = json.load(open(sys.argv[1] if len(sys.argv) > 1 else "targets.json"))
     rows = []
     for t in targets:
         status, root, entry, solc, remaps, impl = fetch(t["address"])
         if status == "ok":
-            ensure_solc(solc)
-            status, findings = scan(root, entry, solc, remaps)
+            if ensure_solc(solc):
+                status, findings = scan(root, entry, solc, remaps)
+            else:
+                status, findings = "solc-failed", []
         else:
             findings = []
         sys.stderr.write("{:<26} {:<13} {} site(s)  [solc {}]{}\n".format(
