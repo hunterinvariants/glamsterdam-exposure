@@ -7,14 +7,29 @@ the class a Glamsterdam gas repricing can break:
   - address.send(...)       forwards a fixed 2300-gas stipend
   - x.call{gas: K}(...)      hardcodes a gas budget on an external call
 
-EIP-1884 (Istanbul, 2019) repriced SLOAD and already made the 2300-gas stipend insufficient once;
-a Glamsterdam gas repricing can do it again. The detector is type-aware: Slither models an ETH
-`.transfer` as the Transfer operation, so an ERC-20 token `.transfer(to, amount)` -- an ordinary
-contract call -- is not flagged.
+Scope: scans every contract in the target, including base/abstract contracts reached only through
+inheritance, so a fragile value-send declared in a base is not missed. Each function is visited in the
+contract that declares it (functions_and_modifiers_declared), so there is no double-reporting; a
+(canonical_name, node_id) seen-set is a backstop. Hardcoded-gas detection is literal-only (a gas budget
+passed as a named constant is not resolved to its value).
+
+Robustness: real verified Etherscan sources pull in many library / interface / abstract contracts, and
+a single one whose nodes/IRs raise during iteration must NOT abort the whole scan. Every contract and
+every function is therefore wrapped so one problematic declaration is skipped, not fatal -- the
+detector degrades to "miss that one function" instead of "crash and report nothing for the target".
+
+EIP-1884 (Istanbul, 2019) already made the 2300-gas stipend insufficient once; a Glamsterdam gas
+repricing can do it again. The detector is type-aware: Slither models an ETH `.transfer` as the
+Transfer operation, so an ERC-20 token `.transfer(to, amount)` -- an ordinary contract call -- is
+not flagged.
 """
 from slither.detectors.abstract_detector import AbstractDetector, DetectorClassification
 from slither.slithir.operations import Transfer, Send, HighLevelCall, LowLevelCall
-from slither.slithir.variables import Constant
+
+try:
+    from slither.slithir.variables.constant import Constant
+except Exception:  # defensive across slither versions
+    Constant = None
 
 
 class GasRepriceFragile(AbstractDetector):
@@ -44,25 +59,48 @@ class GasRepriceFragile(AbstractDetector):
 
     @staticmethod
     def _hardcoded_gas(ir):
-        g = getattr(ir, "call_gas", None)
-        return g if isinstance(g, Constant) else None
+        gas = getattr(ir, "call_gas", None)
+        if gas is None:
+            return None
+        if Constant is not None and isinstance(gas, Constant):
+            return getattr(gas, "value", None)
+        val = getattr(gas, "value", None)
+        return val if isinstance(val, int) else None
+
+    def _scan_function(self, function, seen, results):
+        for node in (getattr(function, "nodes", None) or []):
+            for ir in (getattr(node, "irs", None) or []):
+                reason = None
+                if isinstance(ir, Transfer):
+                    reason = "uses address.transfer() -- forwards a fixed 2300-gas stipend" + self._TAIL
+                elif isinstance(ir, Send):
+                    reason = "uses address.send() -- forwards a fixed 2300-gas stipend" + self._TAIL
+                elif isinstance(ir, (HighLevelCall, LowLevelCall)):
+                    g = self._hardcoded_gas(ir)
+                    if g is not None:
+                        reason = ("hardcodes gas ({}) on an external call -- a gas repricing "
+                                  "can make it insufficient and break this path.".format(g))
+                if reason is not None:
+                    key = (getattr(function, "canonical_name", None) or id(function),
+                           getattr(node, "node_id", None))
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    results.append(self.generate_result([function, "  ", reason, "\n"]))
 
     def _detect(self):
         results = []
-        for contract in self.compilation_unit.contracts_derived:
-            for function in contract.functions_and_modifiers_declared:
-                for node in function.nodes:
-                    for ir in node.irs:
-                        reason = None
-                        if isinstance(ir, Transfer):
-                            reason = "uses address.transfer() -- forwards a fixed 2300-gas stipend" + self._TAIL
-                        elif isinstance(ir, Send):
-                            reason = "uses address.send() -- forwards a fixed 2300-gas stipend" + self._TAIL
-                        elif isinstance(ir, (HighLevelCall, LowLevelCall)):
-                            g = self._hardcoded_gas(ir)
-                            if g is not None:
-                                reason = ("hardcodes gas ({}) on an external call -- a gas repricing "
-                                          "can make it insufficient and break this path.".format(g))
-                        if reason is not None:
-                            results.append(self.generate_result([function, "  ", reason, "\n"]))
+        seen = set()
+        # all contracts (not just leaves) so a fragile send in an inherited base is caught.
+        for contract in (getattr(self.compilation_unit, "contracts", None) or []):
+            try:
+                for function in (getattr(contract, "functions_and_modifiers_declared", None) or []):
+                    try:
+                        self._scan_function(function, seen, results)
+                    except Exception:
+                        # one malformed function (no body, odd IR shape, ...) must not abort the scan
+                        continue
+            except Exception:
+                # one malformed contract (library/interface/abstract edge) must not abort the scan
+                continue
         return results
