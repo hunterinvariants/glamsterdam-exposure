@@ -46,5 +46,14 @@
   {"name": "EigenLayer Delegation",  "address": "0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A"},
   {"name": "Lido WithdrawalQueue",   "address": "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"},
   {"name": "Frax frxETH Minter",     "address": "0xbAFA44EFE7901E04E39Dad13167D089C559c1138"},
-  {"name": "Convex Booster",         "address": "0xF403C135812408BFbE8713b5A23a04b3D48AAE31"}
+  {"name": "Convex Booster",         "address": "0xF403C135812408BFbE8713b5A23a04b3D48AAE31"},
+
+  {"name": "0xSplits SplitMain",     "address": "0x2ed6c4B5dA6378c7897AC67Ba9e43102Feb694EE"},
+  {"name": "Nouns Auction House",    "address": "0x830BD73E4184ceF73443C15111a1DF14e495C706"},
+  {"name": "EtherDelta",             "address": "0x8d12A197cB00D4747a1fe03395095ce2A5CC6819"},
+  {"name": "Meebits",                "address": "0x7Bd29408f11D2bFC23c34f18275bBf23bB716Bc7"},
+  {"name": "Art Blocks Core",        "address": "0x059EDD72Cd353dF5106D2B9cC5ab83a52287aC3a"},
+  {"name": "Bancor Network",         "address": "0x2F9EC37d6CcFFf1caB21733BdaDEdE11c823cCB0"},
+  {"name": "Zora V1 AuctionHouse",   "address": "0xE468cE99444174Bd3bBBEd09209577d25D1ad673"},
+  {"name": "Hashmasks",              "address": "0xC2C747E0F7004F9E8817Db2ca4997657a7746928"}
 ]

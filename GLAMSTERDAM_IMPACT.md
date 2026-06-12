@@ -8,9 +8,9 @@ scanned with the `gas-reprice-fragile` detector. Every site is a real line in de
 
 ## Summary
 
-- contracts scanned (compiled): 47
-- contracts with fragile sites: 13
-- total flagged sites: 20
+- contracts scanned (compiled): 55
+- contracts with fragile sites: 16
+- total flagged sites: 23
 
 | Contract | Address | solc | Status | Sites |
 |---|---|---|---|:--:|
@@ -61,6 +61,14 @@ scanned with the `gas-reprice-fragile` detector. Every site is a real line in de
 | Lido WithdrawalQueue | `0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1` | 0.8.9 | clean | 0 |
 | Frax frxETH Minter | `0xbAFA44EFE7901E04E39Dad13167D089C559c1138` | 0.8.16 | clean | 0 |
 | Convex Booster | `0xF403C135812408BFbE8713b5A23a04b3D48AAE31` | 0.6.12 | clean | 0 |
+| 0xSplits SplitMain | `0x2ed6c4B5dA6378c7897AC67Ba9e43102Feb694EE` | 0.8.4 | clean | 0 |
+| Nouns Auction House | `0x830BD73E4184ceF73443C15111a1DF14e495C706` | 0.8.23 | clean | 0 |
+| EtherDelta | `0x8d12A197cB00D4747a1fe03395095ce2A5CC6819` | 0.4.9 | clean | 0 |
+| Meebits | `0x7Bd29408f11D2bFC23c34f18275bBf23bB716Bc7` | 0.7.6 | ok | 1 |
+| Art Blocks Core | `0x059EDD72Cd353dF5106D2B9cC5ab83a52287aC3a` | 0.5.17 | ok | 1 |
+| Bancor Network | `0x2F9EC37d6CcFFf1caB21733BdaDEdE11c823cCB0` | 0.4.26 | clean | 0 |
+| Zora V1 AuctionHouse | `0xE468cE99444174Bd3bBBEd09209577d25D1ad673` | 0.6.8 | clean | 0 |
+| Hashmasks | `0xC2C747E0F7004F9E8817Db2ca4997657a7746928` | 0.7.1 | ok | 1 |
 
 ## Sites
 
@@ -109,6 +117,15 @@ scanned with the `gas-reprice-fragile` detector. Every site is a real line in de
 
 ### rETH  (`0xae78736Cd615f374D3085123A210448E74Fc6393`)
 - RocketTokenRETH.burn(uint256) (contracts/contract/token/RocketTokenRETH.sol#132-149) uses address.transfer() -- forwards a fixed 2300-gas stipend; an EVM gas repricing (e.g. Glamsterdam) can make it insufficient and break this path.  (contracts/contract/token/RocketTokenRETH.sol:132)
+
+### Meebits  (`0x7Bd29408f11D2bFC23c34f18275bBf23bB716Bc7`)
+- Meebits.mint() (Meebits.sol#393-405) uses address.transfer() -- forwards a fixed 2300-gas stipend; an EVM gas repricing (e.g. Glamsterdam) can make it insufficient and break this path.  (Meebits.sol:393)
+
+### Art Blocks Core  (`0x059EDD72Cd353dF5106D2B9cC5ab83a52287aC3a`)
+- GenArt721._splitFunds(uint256) (GenArt721.sol#998-1028) uses address.transfer() -- forwards a fixed 2300-gas stipend; an EVM gas repricing (e.g. Glamsterdam) can make it insufficient and break this path.  (GenArt721.sol:998)
+
+### Hashmasks  (`0xC2C747E0F7004F9E8817Db2ca4997657a7746928`)
+- Masks.withdraw() (Users/gauthm/Ethereum/kingzului/contracts/Masks.sol#333-336) uses address.transfer() -- forwards a fixed 2300-gas stipend; an EVM gas repricing (e.g. Glamsterdam) can make it insufficient and break this path.  (Users/gauthm/Ethereum/kingzului/contracts/Masks.sol:333)
 
 ## Reading this
 
