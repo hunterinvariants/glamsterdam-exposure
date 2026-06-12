@@ -1,0 +1,32 @@
+name: two-way-proof
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  corpus:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install slither, solc, and the detector
+        run: |
+          python -m pip install --upgrade pip
+          pip install slither-analyzer==0.11.5 solc-select
+          pip install -e detector/
+          solc-select install 0.8.19
+          solc-select use 0.8.19
+
+      - name: Two-way proof -- Fragile fires, Safe is clean
+        run: |
+          count() {
+            slither "$1" --detect gas-reprice-fragile --json - 2>/dev/null \
+              | python -c "import sys,json; d=json.load(sys.stdin); print(sum(1 for x in d.get('results',{}).get('detectors',[]) if x.get('check')=='gas-reprice-fragile'))"
+          }
+          F=$(count corpus/Fragile.sol); echo "Fragile.sol findings: ${F:-0}  (expect >= 1)"
+          S=$(count corpus/Safe.sol);    echo "Safe.sol    findings: ${S:-1}  (expect 0)"
+          [ "${F:-0}" -ge 1 ] || { echo "FAIL: Fragile.sol should fire"; exit 1; }
+          [ "${S:-1}" -eq 0 ] || { echo "FAIL: Safe.sol should be clean"; exit 1; }
+          echo "two-way proof: PASS"

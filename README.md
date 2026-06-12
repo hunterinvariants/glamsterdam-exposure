@@ -1,10 +1,17 @@
 # Glamsterdam exposure
 
+[![two-way proof](https://github.com/hunterinvariants/glamsterdam-exposure/actions/workflows/ci.yml/badge.svg)](https://github.com/hunterinvariants/glamsterdam-exposure/actions/workflows/ci.yml)
+
 A tool that measures how exposed deployed Ethereum contracts are to a Glamsterdam gas repricing. It
 pulls verified source from Etherscan by address, follows proxies to their implementation, compiles
 each contract with its original solc, runs a Slither detector for gas-reprice-fragile patterns, and
 aggregates the hits into a dataset of which deployed contracts forward a fixed gas budget a repricing
 can underfund.
+
+Current scan: 55 deployed contracts compiled, 16 carry the pattern across 23 sites -- WETH9, Compound
+cETH, the ENS registrar, the Gnosis Safe singleton, the 1inch v5 router, and older NFT contracts
+(CryptoPunks, Art Blocks, Meebits) among them; modern routers (Uniswap, Sushi, 0x, Balancer) come back
+clean. Full per-contract results in GLAMSTERDAM_IMPACT.md.
 
 ## The pattern
 
