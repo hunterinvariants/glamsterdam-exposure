@@ -8,16 +8,16 @@ each contract with its original solc, runs a Slither detector for gas-reprice-fr
 aggregates the hits into a dataset of which deployed contracts forward a fixed gas budget a repricing
 can underfund.
 
-Current scan: 55 deployed contracts compiled, 16 carry the pattern across 23 sites -- WETH9, Compound
-cETH, the ENS registrar, the Gnosis Safe singleton, the 1inch v5 router, and older NFT contracts
-(CryptoPunks, Art Blocks, Meebits) among them; modern routers (Uniswap, Sushi, 0x, Balancer) come back
+Current scan: 55 deployed contracts compiled, 16 carry the pattern across 23 sites. Among them are
+WETH9, Compound cETH, the ENS registrar, the Gnosis Safe singleton, the 1inch v5 router, and older NFT
+contracts (CryptoPunks, Art Blocks, Meebits). Modern routers (Uniswap, Sushi, 0x, Balancer) come back
 clean. Full per-contract results in GLAMSTERDAM_IMPACT.md.
 
 ## The pattern
 
 `address.transfer` and `address.send` forward a fixed 2300-gas stipend to the recipient. EIP-1884
 (Istanbul, 2019) repriced SLOAD from 200 to 800 gas and made that stipend insufficient for any
-recipient whose fallback touches storage -- a class of contracts began reverting on every ETH send.
+recipient whose fallback touches storage. A class of contracts began reverting on every ETH send.
 The Glamsterdam meta (EIP-7773) lists a comprehensive gas repricing package, so the same failure mode
 can recur. The detector flags the three ways a contract pins a gas budget:
 
@@ -26,7 +26,7 @@ can recur. The detector flags the three ways a contract pins a gas budget:
   - `to.call{gas: K}(...)`  -- a hardcoded gas budget on an external call
 
 It is type-aware: Slither models an ETH `.transfer` as a distinct operation, so an ERC-20 token
-`.transfer(to, amount)` -- an ordinary contract call -- is not flagged. That keeps the false-positive
+`.transfer(to, amount)` (an ordinary contract call) is not flagged. That keeps the false-positive
 rate low. The `Safe.sol` corpus case, which pays with `.call` and moves a token with `.transfer`,
 produces zero findings; `Fragile.sol` produces three.
 
@@ -54,14 +54,14 @@ rather than dropping anything silently.
 
 ## The dataset
 
-`GLAMSTERDAM_IMPACT.md` is the current scan. The fragile pattern is narrow by design -- it bites raw
-ETH sends, not ERC-20 transfers, and most post-2019 code moved to `.call`. What remains is the older,
-foundational layer: WETH9 (`withdraw`), Compound cETH (`doTransferOut`), the ENS registrar, CryptoPunks
-and CryptoKitties all forward the 2300-gas stipend, and WETH9 sits under most of DeFi. The pattern is
-not only legacy -- the Gnosis Safe singleton forwards the stipend in a `.send` refund path, and the
-1inch v5 router hardcodes a 20000-gas external call. The individual fact is not new -- the stipend
-hazard has been known since EIP-1884 -- but a reproducible, ecosystem-wide measurement of it, refreshed
-against the actual Glamsterdam repricing, is.
+`GLAMSTERDAM_IMPACT.md` is the current scan. The fragile pattern is narrow by design: it bites raw
+ETH sends rather than ERC-20 transfers, and most post-2019 code moved to `.call`. What remains is the
+older, foundational layer. WETH9 (`withdraw`), Compound cETH (`doTransferOut`), the ENS registrar,
+CryptoPunks, and CryptoKitties all forward the 2300-gas stipend, and WETH9 sits under most of DeFi. The
+pattern is not only legacy. The Gnosis Safe singleton forwards the stipend in a `.send` refund path, and
+the 1inch v5 router hardcodes a 20000-gas external call. The stipend hazard has been known since
+EIP-1884; what did not exist is a reproducible, ecosystem-wide measurement of it, refreshed against the
+actual Glamsterdam repricing.
 
 ## Roadmap
 
